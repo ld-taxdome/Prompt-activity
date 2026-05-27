@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompting Activity</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0018;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem}
+.ac{width:100%;max-width:760px;background:linear-gradient(148deg,#0e0028 0%,#070e3e 48%,#020f1c 100%);border-radius:24px;overflow:hidden;position:relative;border:2px solid rgba(255,255,255,.07)}
+.orb{position:absolute;border-radius:50%;pointer-events:none;z-index:0}
+.o1{width:360px;height:360px;background:radial-gradient(circle,rgba(110,40,240,.36) 0%,transparent 68%);top:-100px;left:-100px}
+.o2{width:260px;height:260px;background:radial-gradient(circle,rgba(20,80,220,.28) 0%,transparent 68%);bottom:-80px;right:-70px}
+.hd{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.4rem;background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.02));border-bottom:1px solid rgba(255,255,255,.08)}
+.lts{display:flex;gap:6px}
+.lt{width:10px;height:10px;border-radius:50%}
+.lr{background:#ff4f4f;box-shadow:0 0 7px #ff4f4f}.ly{background:#ffd600;box-shadow:0 0 7px #ffd600}.lg{background:#3ddc68;box-shadow:0 0 7px #3ddc68}.lb{background:#2db5ff;box-shadow:0 0 7px #2db5ff}.lp{background:#c05eff;box-shadow:0 0 7px #c05eff}.lw{background:#fff;box-shadow:0 0 7px #fff}
+@keyframes tw{0%,100%{opacity:1}50%{opacity:.12}}
+.lr{animation:tw 1.1s 0s infinite}.ly{animation:tw 1.1s .18s infinite}.lg{animation:tw 1.1s .36s infinite}.lb{animation:tw 1.1s .54s infinite}.lp{animation:tw 1.1s .72s infinite}.lw{animation:tw 1.1s .9s infinite}
+.htitle{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.6);text-shadow:0 0 16px rgba(150,80,255,.7)}
+.hscore{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.14);border-radius:9px;padding:.28rem .85rem}
+.hsn{font-size:19px;font-weight:700;color:#fff;text-shadow:0 0 14px rgba(160,80,255,.8);line-height:1}
+.hss{font-size:13px;color:rgba(255,255,255,.22)}.hst{font-size:13px;color:rgba(255,255,255,.32);font-weight:500}
+.qwrap{position:relative;z-index:2;padding:1.25rem 1.25rem .85rem;overflow:hidden}
+@keyframes cIn{0%{transform:translateX(60px);opacity:0}100%{transform:translateX(0);opacity:1}}
+@keyframes cOut{0%{transform:translateX(0);opacity:1}100%{transform:translateX(-60px);opacity:0}}
+.card-in{animation:cIn .3s ease-out forwards}
+.card-out{animation:cOut .22s ease-in forwards}
+.qcard{background:rgba(255,255,255,.09);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:1.35rem;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.16)}
+.qbadge{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;padding:3px 11px;border-radius:20px;margin-bottom:.85rem;color:#fff}
+.qbadge.t-sw{background:rgba(139,92,246,.3);border:1px solid rgba(167,139,250,.45)}
+.qbadge.t-mp{background:rgba(16,185,129,.25);border:1px solid rgba(52,211,153,.4)}
+.qbadge.t-sf{background:rgba(245,158,11,.25);border:1px solid rgba(251,191,36,.4)}
+.bdot{width:6px;height:6px;border-radius:50%}
+.t-sw .bdot{background:#a78bfa;box-shadow:0 0 5px #a78bfa}
+.t-mp .bdot{background:#34d399;box-shadow:0 0 5px #34d399}
+.t-sf .bdot{background:#fbbf24;box-shadow:0 0 5px #fbbf24}
+.qinstr{font-size:14.5px;font-weight:600;color:#fff;line-height:1.5;margin-bottom:1rem}
+.pbox{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:.9rem 1.1rem;font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.65;margin-bottom:1.1rem;font-style:italic}
+.sw-btns{display:flex;gap:.75rem;margin-bottom:.2rem}
+.sw-btn{flex:1;padding:.75rem 1rem;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid;transition:transform .12s,background .12s;color:#fff}
+.sw-btn:hover:not(:disabled){transform:translateY(-2px)}
+.sw-btn:disabled{cursor:default;transform:none;opacity:.6}
+.sw-strong{background:rgba(52,211,153,.16);border-color:rgba(52,211,153,.45)}
+.sw-strong:hover:not(:disabled){background:rgba(52,211,153,.26)}
+.sw-weak{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.45)}
+.sw-weak:hover:not(:disabled){background:rgba(248,113,113,.25)}
+.sw-btn.cr{background:rgba(52,211,153,.28)!important;border-color:rgba(52,211,153,.8)!important;box-shadow:0 0 16px rgba(52,211,153,.2)}
+.sw-btn.cw{background:rgba(248,113,113,.25)!important;border-color:rgba(248,113,113,.7)!important}
+.sw-btn.rv{background:rgba(52,211,153,.2)!important;border-color:rgba(52,211,153,.6)!important}
+.mp-btns{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.2rem}
+.mp-btn{padding:.65rem .9rem;border-radius:11px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid;transition:transform .12s,background .12s;color:#fff;text-align:center}
+.mp-btn:hover:not(:disabled){transform:translateY(-1px)}
+.mp-btn:disabled{cursor:default;transform:none;opacity:.6}
+.mp-r{background:rgba(139,92,246,.18);border-color:rgba(167,139,250,.4)}.mp-r:hover:not(:disabled){background:rgba(139,92,246,.3)}
+.mp-c{background:rgba(16,185,129,.16);border-color:rgba(52,211,153,.38)}.mp-c:hover:not(:disabled){background:rgba(16,185,129,.28)}
+.mp-t{background:rgba(59,130,246,.18);border-color:rgba(99,179,237,.38)}.mp-t:hover:not(:disabled){background:rgba(59,130,246,.3)}
+.mp-f{background:rgba(245,158,11,.18);border-color:rgba(251,191,36,.38)}.mp-f:hover:not(:disabled){background:rgba(245,158,11,.28)}
+.mp-btn.cr{box-shadow:0 0 14px rgba(52,211,153,.2);border-color:rgba(52,211,153,.8)!important;background:rgba(52,211,153,.25)!important}
+.mp-btn.cw{border-color:rgba(248,113,113,.7)!important;background:rgba(248,113,113,.22)!important}
+.mp-btn.rv{border-color:rgba(52,211,153,.7)!important;background:rgba(52,211,153,.18)!important}
+.sf-hint{font-size:12.5px;color:rgba(255,255,255,.45);margin-bottom:.7rem;font-style:italic}
+.sf-segs{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.2rem}
+.sf-seg{padding:.65rem 1rem;border-radius:11px;font-size:13px;line-height:1.5;cursor:pointer;font-family:inherit;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;text-align:left;display:flex;gap:.7rem;align-items:flex-start;transition:background .12s,border-color .12s,transform .1s;width:100%}
+.sf-seg:hover:not(:disabled){background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.32);transform:translateY(-1px)}
+.sf-seg:disabled{cursor:default;transform:none;opacity:.65}
+.sf-ltr{font-size:10px;font-weight:800;width:19px;height:19px;min-width:19px;border-radius:5px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;color:#fff}
+.sf-seg.cr{background:rgba(52,211,153,.2)!important;border-color:rgba(52,211,153,.7)!important;box-shadow:0 0 14px rgba(52,211,153,.15)}
+.sf-seg.cw{background:rgba(248,113,113,.18)!important;border-color:rgba(248,113,113,.65)!important}
+.sf-seg.rv{background:rgba(52,211,153,.16)!important;border-color:rgba(52,211,153,.6)!important}
+.fbarea{margin-top:.9rem;border-radius:10px;padding:.75rem .95rem;font-size:13px;line-height:1.6;display:none;color:#fff}
+.fbarea.ok{background:rgba(52,211,153,.13);border:1px solid rgba(52,211,153,.35);border-left:3px solid #34d399;display:block}
+.fbarea.no{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);border-left:3px solid #f87171;display:block}
+.nextbtn{margin-top:.95rem;width:100%;padding:.7rem;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;display:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.nextbtn:hover{background:rgba(255,255,255,.18)}
+.nextbtn.show{display:block}
+.ft{position:relative;z-index:2;background:rgba(255,255,255,.025);border-top:1px solid rgba(255,255,255,.07);padding:.6rem 1.4rem;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.pdot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.14);transition:all .35s}
+.pdot.done{background:#34d399;box-shadow:0 0 6px rgba(52,211,153,.7)}
+.pdot.cur{background:#fff;width:22px;border-radius:5px;box-shadow:0 0 8px rgba(255,255,255,.55)}
+.comp{display:none;position:relative;z-index:2;padding:1.25rem}
+.comp.show{display:block}
+.comp-glass{background:rgba(255,255,255,.09);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:2rem 1.75rem;text-align:center;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.16)}
+.ce{font-size:48px;display:block;margin-bottom:.85rem}
+.ct{font-size:21px;font-weight:700;color:#fff;margin-bottom:.65rem;text-shadow:0 2px 14px rgba(160,80,255,.5)}
+.csub{font-size:13.5px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:1.35rem;max-width:460px;margin-left:auto;margin-right:auto}
+.csub strong{color:#fff;font-weight:600}
+.cstats{display:flex;gap:.8rem;justify-content:center;margin-bottom:1.25rem}
+.cst{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.17);border-radius:12px;padding:.65rem 1.1rem;text-align:center}
+.cstn{font-size:24px;font-weight:700;color:#fff;line-height:1;text-shadow:0 0 14px rgba(160,80,255,.55)}
+.cstl{font-size:10px;color:rgba(255,255,255,.42);margin-top:3px;font-weight:500}
+.cstars{font-size:24px;letter-spacing:5px;display:block;margin-bottom:1.2rem}
+.cmsg{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:11px;padding:.85rem 1.1rem;font-size:13px;color:rgba(255,255,255,.7);line-height:1.65;margin-bottom:1.35rem;text-align:left}
+.crst{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:.6rem 1.35rem;color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.crst:hover{background:rgba(255,255,255,.18)}
+</style>
+</head>
+<body>
+<div class="ac">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="hd">
+    <div class="lts"><span class="lt lr"></span><span class="lt ly"></span><span class="lt lg"></span><span class="lt lb"></span><span class="lt lp"></span><span class="lt lw"></span></div>
+    <div class="htitle">Prompting Activity</div>
+    <div class="hscore"><span class="hsn" id="sn">0</span><span class="hss">/</span><span class="hst">10</span></div>
+  </div>
+  <div class="qwrap" id="qwrap"><div class="qcard" id="qcard"></div></div>
+  <div class="comp" id="comp"></div>
+  <div class="ft"><div id="pdots" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center"></div></div>
+</div>
+<script>
+const Qs=[
+  // Q1 — Strong or Weak (WEAK)
+  {type:'sw',label:'STRONG OR WEAK?',instr:'Read this prompt. Is it strong or weak?',
+   prompt:'"Write something for the team."',answer:'weak',
+   fb:{weak:'Correct — this prompt has no role, no context, no specific task, and no format. The AI has almost nothing to work with and will produce something generic.',
+       strong:'Not quite — this is a weak prompt. It is missing all four components: role, context, task, and format.'}},
+
+  // Q2 — Missing Piece (CONTEXT)
+  {type:'mp',label:'MISSING PIECE',instr:'One component is missing from this prompt. Which one?',
+   prompt:'"Write a short follow-up email to a client who just completed their first onboarding session — keep it warm and under 100 words."',answer:'context',
+   fb:{role:'Not quite — while there is no explicit role, that is not the biggest gap here.',
+       context:'Correct — Context is missing. There is no background on the client, what the onboarding covered, or what the email should specifically address. Without it the output will be generic.',
+       task:'Not quite — the task is clearly there: write a follow-up email.',
+       format:'Not quite — format is covered: warm tone, under 100 words.'}},
+
+  // Q3 — Spot the Flaw (CONFIDENTIAL DATA)
+  {type:'sf',label:'SPOT THE FLAW',instr:'One of these four segments contains a problem. Click on it.',
+   segs:[{t:'You are a team lead.',bad:false},{t:'Write a performance update for James Parker, Employee ID 3842,',bad:true},{t:'who has been underperforming this quarter.',bad:false},{t:'Keep it under 150 words.',bad:false}],
+   fb:{right:'Correct — segment B contains confidential employee data: a real name and an employee ID. These must never be pasted into any AI tool. Use a placeholder like "a team member" instead.',
+       wrong:'Not quite — the problem is in segment B. It contains a real name and employee ID. Confidential data must never go into any AI tool.'}},
+
+  // Q4 — Strong or Weak (STRONG)
+  {type:'sw',label:'STRONG OR WEAK?',instr:'Read this prompt. Is it strong or weak?',
+   prompt:'"You are an internal communications manager. Our company is rolling out a new flexible working policy next month and some employees are anxious about the change. Write an announcement email that explains the three key changes and ends on a reassuring note — keep it under 200 words, warm and professional tone."',answer:'strong',
+   fb:{strong:'Correct — this prompt has all four components: Role (comms manager), Context (new policy, anxious employees), Task (announcement with specific requirements), and Format (length and tone).',
+       weak:'Not quite — this is actually a strong prompt. It clearly covers Role, Context, Task, and Format.'}},
+
+  // Q5 — Missing Piece (ROLE)
+  {type:'mp',label:'MISSING PIECE',instr:'One component is missing from this prompt. Which one?',
+   prompt:'"Our project just missed a deadline due to unclear ownership. Write a message to the team addressing what happened and outlining three steps to prevent it going forward."',answer:'role',
+   fb:{role:'Correct — Role is missing. There is no persona given. Is this written by a project manager, a team lead, or a director? The tone and authority of the message will vary significantly depending on who is writing it.',
+       context:'Not quite — Context is there: the missed deadline and its cause.',
+       task:'Not quite — the Task is clear: write a message about what happened and outline next steps.',
+       format:'Not quite — Format is partially covered with the three steps, though it could be more specific.'}},
+
+  // Q6 — Spot the Flaw (VAGUE TASK)
+  {type:'sf',label:'SPOT THE FLAW',instr:'One of these four segments contains a problem. Click on it.',
+   segs:[{t:'You are an HR manager.',bad:false},{t:'We are updating our leave policy to add two extra personal days.',bad:false},{t:'Write literally everything you know about this topic.',bad:true},{t:'Keep it professional.',bad:false}],
+   fb:{right:'Correct — "Write literally everything you know about this topic" is far too vague. A strong task should specify what format, what audience, and what the output should look like.',
+       wrong:'Not quite — the problem is in segment C. "Write literally everything you know about this topic" gives the AI no direction on what to produce.'}},
+
+  // Q7 — Missing Piece (FORMAT)
+  {type:'mp',label:'MISSING PIECE',instr:'One component is missing from this prompt. Which one?',
+   prompt:'"You are a project manager. Our client has been frustrated with slow response times over the past two weeks. Write a professional apology email addressing their concerns."',answer:'format',
+   fb:{role:'Not quite — Role is there: project manager.',
+       context:'Not quite — Context is there: a frustrated client and two weeks of slow response times.',
+       task:'Not quite — Task is clear: write a professional apology email.',
+       format:'Correct — Format is missing. No guidance on length, tone, or structure. Should it be three sentences or three paragraphs? Should it include next steps? Without this the output might miss the mark.'}},
+
+  // Q8 — Strong or Weak (STRONG)
+  {type:'sw',label:'STRONG OR WEAK?',instr:'Read this prompt. Is it strong or weak?',
+   prompt:'"You are a senior product manager. The sales team needs a one-pager comparing our product to two competitors across three features: ease of setup, integrations, and pricing model. Write a clear comparison using a table — keep the language simple enough for a non-technical reader."',answer:'strong',
+   fb:{strong:'Correct — this prompt covers all four components: Role (senior PM), Context (sales team request, specific comparison), Task (comparison across three features), and Format (table, plain language, non-technical audience).',
+       weak:'Not quite — this is actually a strong prompt. It clearly defines Role, Context, Task, and Format.'}},
+
+  // Q9 — Missing Piece (TASK)
+  {type:'mp',label:'MISSING PIECE',instr:'One component is missing from this prompt. Which one?',
+   prompt:'"You are a learning and development manager. Our company is rolling out AI tools to all teams next quarter and employees have varying levels of digital confidence."',answer:'task',
+   fb:{role:'Not quite — Role is clearly there: learning and development manager.',
+       context:'Not quite — Context is strong: company-wide AI rollout, varying confidence levels, next quarter timeline.',
+       task:'Correct — Task is missing. The role and context are well defined but there is no instruction on what to produce. Should the AI write a training plan? Draft a communication? Create a FAQ? Without a task the AI does not know what to create.',
+       format:'Not quite — while format could be more specific, the bigger gap is that no task has been given at all.'}},
+
+  // Q10 — Spot the Flaw (AI ASKED TO TAKE ACTION)
+  {type:'sf',label:'SPOT THE FLAW',instr:'One of these four segments contains a problem. Click on it.',
+   segs:[{t:'You are a marketing manager.',bad:false},{t:'We are launching a new product feature next week targeting small businesses.',bad:false},{t:'Write a punchy three-sentence LinkedIn post announcing the launch.',bad:false},{t:'Once you have written it, go ahead and post it to our LinkedIn page at 9am tomorrow.',bad:true}],
+   fb:{right:'Correct — AI tools generate text; they cannot take real-world actions like posting to social media or scheduling content. Segment D asks the AI to do something it is simply not capable of. Generate the text with AI, then handle the posting yourself.',
+       wrong:'Not quite — the problem is in segment D. AI cannot post or schedule content on external platforms. It can only generate text — actions like publishing must be handled by you.'}}
+];
+
+const TOTAL=Qs.length;
+let cur=0,score=0,locked=false;
+
+function init(){
+  cur=0;score=0;locked=false;
+  document.getElementById('sn').textContent='0';
+  document.getElementById('comp').className='comp';
+  document.getElementById('comp').innerHTML='';
+  document.getElementById('qwrap').style.display='block';
+  renderDots();buildCard();
+}
+
+function renderDots(){
+  const c=document.getElementById('pdots');c.innerHTML='';
+  for(let i=0;i<TOTAL;i++){
+    const d=document.createElement('div');
+    d.className='pdot'+(i<cur?' done':i===cur?' cur':'');
+    c.appendChild(d);
+  }
+}
+
+function buildCard(){
+  const q=Qs[cur];const ltrs=['A','B','C','D'];
+  let h=`<div class="qbadge t-${q.type}"><span class="bdot"></span>${q.label}</div><div class="qinstr">${q.instr}</div>`;
+  if(q.type==='sw'||q.type==='mp') h+=`<div class="pbox">${q.prompt}</div>`;
+  if(q.type==='sw'){
+    h+=`<div class="sw-btns"><button class="sw-btn sw-strong" id="bs" onclick="pickSW('strong')">✓ Strong</button><button class="sw-btn sw-weak" id="bw" onclick="pickSW('weak')">✗ Weak</button></div>`;
+  } else if(q.type==='mp'){
+    h+=`<div class="mp-btns"><button class="mp-btn mp-r" id="br" onclick="pickMP('role')">Role</button><button class="mp-btn mp-c" id="bc" onclick="pickMP('context')">Context</button><button class="mp-btn mp-t" id="bt" onclick="pickMP('task')">Task</button><button class="mp-btn mp-f" id="bf" onclick="pickMP('format')">Format</button></div>`;
+  } else if(q.type==='sf'){
+    h+=`<div class="sf-hint">Read each part carefully — click the one with the problem.</div><div class="sf-segs">`;
+    q.segs.forEach((s,i)=>{h+=`<button class="sf-seg" id="s${i}" onclick="pickSF(${i})"><span class="sf-ltr">${ltrs[i]}</span><span>${s.t}</span></button>`;});
+    h+=`</div>`;
+  }
+  h+=`<div class="fbarea" id="fb"></div><button class="nextbtn" id="nxt" onclick="nextQ()">${cur<TOTAL-1?'Next question →':'See my results'}</button>`;
+  const card=document.createElement('div');card.className='qcard card-in';card.id='qcard';card.innerHTML=h;
+  const wrap=document.getElementById('qwrap');wrap.innerHTML='';wrap.appendChild(card);locked=false;
+}
+
+function showFb(ok,txt){
+  const fb=document.getElementById('fb');
+  fb.textContent=(ok?'✓ ':'✗ ')+txt;
+  fb.className='fbarea '+(ok?'ok':'no');
+  if(ok)score++;
+  document.getElementById('sn').textContent=score;
+  document.getElementById('nxt').classList.add('show');
+  locked=true;
+}
+
+function pickSW(v){
+  if(locked)return;
+  const q=Qs[cur];const ok=v===q.answer;
+  const bs=document.getElementById('bs');const bw=document.getElementById('bw');
+  bs.disabled=true;bw.disabled=true;
+  (v==='strong'?bs:bw).classList.add(ok?'cr':'cw');
+  if(!ok)(q.answer==='strong'?bs:bw).classList.add('rv');
+  showFb(ok,q.fb[v]);
+}
+
+function pickMP(v){
+  if(locked)return;
+  const q=Qs[cur];const ok=v===q.answer;
+  const ids={role:'br',context:'bc',task:'bt',format:'bf'};
+  Object.values(ids).forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=true;});
+  const cb=document.getElementById(ids[v]);if(cb)cb.classList.add(ok?'cr':'cw');
+  if(!ok){const rb=document.getElementById(ids[q.answer]);if(rb)rb.classList.add('rv');}
+  showFb(ok,q.fb[v]);
+}
+
+function pickSF(i){
+  if(locked)return;
+  const q=Qs[cur];const ok=q.segs[i].bad;
+  for(let j=0;j<q.segs.length;j++){const s=document.getElementById('s'+j);if(s)s.disabled=true;}
+  document.getElementById('s'+i).classList.add(ok?'cr':'cw');
+  if(!ok){const ri=q.segs.findIndex(s=>s.bad);if(ri>=0)document.getElementById('s'+ri).classList.add('rv');}
+  showFb(ok,ok?q.fb.right:q.fb.wrong);
+}
+
+function nextQ(){
+  const old=document.getElementById('qcard');old.classList.add('card-out');
+  setTimeout(()=>{cur++;if(cur>=TOTAL){showComp();return;}renderDots();buildCard();},230);
+}
+
+function showComp(){
+  document.getElementById('qwrap').style.display='none';
+  const p=score/TOTAL;
+  const s=p>=.8?'★★★':p>=.6?'★★☆':'★☆☆';
+  const sc=p>=.6?'#fbbf24':'rgba(255,255,255,.25)';
+  const msg=p>=.8?'Excellent — you have a strong instinct for what makes a prompt work and what breaks it. You are ready to put these skills into practice.':p>=.6?'Good effort. Review the questions you missed and revisit the dos and don\'ts section to tighten any gaps.':'Head back to the anatomy and dos and don\'ts sections before trying this activity again — prompting is a skill that builds with repetition.';
+  const comp=document.getElementById('comp');
+  comp.innerHTML=`<div class="comp-glass"><span class="ce">✦</span><div class="ct">Activity complete!</div><div class="csub">Thank you for working through the Prompting Basics activity. Spotting what makes a prompt strong — or what breaks it — is the foundation of getting genuinely useful results from AI.<br><br><strong>Congratulations on completing this activity.</strong></div><div class="cstats"><div class="cst"><div class="cstn">${score}/10</div><div class="cstl">Correct</div></div><div class="cst"><div class="cstn">${10-score}/10</div><div class="cstl">Missed</div></div></div><span class="cstars" style="color:${sc}">${s}</span><div class="cmsg">${msg}</div><button class="crst" onclick="init()">↺ Try again</button></div>`;
+  comp.classList.add('show');renderDots();
+}
+
+init();
+</script>
+</body>
+</html>
